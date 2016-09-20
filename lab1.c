@@ -42,11 +42,12 @@ process producer(sid32 producer_mutex,sid32 consumer_mutex) {
 	
 
 	mutex_acquire(producer_mutex);
-	buffer[prod_counter] = data;
+	buffer[prod_counter] = i;
 	kprintf("%d \n",buffer[prod_counter]);
 	mutex_release(consumer_mutex);
-	return OK;
+	
 	}
+	return OK;
 }
 
 
@@ -63,6 +64,7 @@ process producer(sid32 producer_mutex,sid32 consumer_mutex) {
  			consumer_counter = 0;
 
  	mutex_acquire(consumer_mutex);
+ 	kprintf("%d \n",buffer[consumer_counter]);
  	consumed_count = consumed_count +1;
  	mutex_release(producer_mutex);
  	}
@@ -75,7 +77,7 @@ return OK;
 void time_and_end(void) {
 int32 times[5]; int32 i;
 for (i = 0; i < 5; ++i) { 
-		times[i] = clktime;
+		times[i] = clktime_ms;
 	while (consumed_count < CONSUMED_MAX * (i+1));
 	times[i] = clktime_ms - times[i];
 			consumed_count = 0;
@@ -94,6 +96,7 @@ process main(void) {
 
 	producer_mutex = semcreate(1); //initialize mutex 
 	consumer_mutex = semcreate(0);
+	kprintf("pranav");
 
 /* Create the shared circular buffer and semaphores here */ /* */
 	producer_id = create(producer, 4096, 50, "producer", 2,producer_mutex,consumer_mutex); 

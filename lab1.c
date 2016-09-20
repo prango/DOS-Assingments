@@ -6,7 +6,7 @@ int32 consumed_count = 0;
 
 const int32 CONSUMED_MAX = 100;
 
-int32 buffer[100];
+int32 buffer[50];
 
 
 /* Define your circular buffer structure and semaphore variables here */ /* */
@@ -33,9 +33,9 @@ process producer(sid32 producer_mutex,sid32 consumer_mutex) {
 
 	int32 prod_counter,i;
 
-	for(i=1; i<=2000; i++){ 
+	for(i=1; i<=1500; i++){ 
 
-		if (prod_counter <= 100)
+		if (prod_counter <= 50)
 			prod_counter = prod_counter + 1;
 		else
 			prod_counter = 0;
@@ -43,7 +43,7 @@ process producer(sid32 producer_mutex,sid32 consumer_mutex) {
 
 	mutex_acquire(producer_mutex);
 	buffer[prod_counter] = i;
-	kprintf("%d \n",buffer[prod_counter]);
+	kprintf("producer value : %d - ",buffer[prod_counter]);
 	mutex_release(consumer_mutex);
 	
 	}
@@ -57,14 +57,14 @@ process producer(sid32 producer_mutex,sid32 consumer_mutex) {
  	
  	int32 consumer_counter,i;
  	
- 	for(i=1; i<=2000; i++){
- 		if(consumer_counter <= 100)
+ 	for(i=1; i<=1500; i++){
+ 		if(consumer_counter <= 50)
  			consumer_counter = consumer_counter + 1;
  		else
  			consumer_counter = 0;
 
  	mutex_acquire(consumer_mutex);
- 	kprintf("%d \n",buffer[consumer_counter]);
+ 	kprintf("consumer value : %d \n",buffer[consumer_counter]);
  	consumed_count = consumed_count +1;
  	mutex_release(producer_mutex);
  	}
@@ -96,11 +96,14 @@ process main(void) {
 
 	producer_mutex = semcreate(1); //initialize mutex 
 	consumer_mutex = semcreate(0);
-	kprintf("pranav");
+	//kprintf("pranav");
 
 /* Create the shared circular buffer and semaphores here */ /* */
 	producer_id = create(producer, 4096, 50, "producer", 2,producer_mutex,consumer_mutex); 
 	consumer_id = create(consumer, 4096, 50, "consumer", 2,producer_mutex ,consumer_mutex); 
+	
+
+
 	resume(producer_id); 
 	resume(consumer_id);
 /* Uncomment the following line for part 3 to see timing results */ /* time_and_end(); */
